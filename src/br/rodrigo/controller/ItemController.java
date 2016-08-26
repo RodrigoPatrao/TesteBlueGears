@@ -24,6 +24,9 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 public class ItemController {
+    
+    EntityManager em = JPAController.getEntityManager();
+    EntityTransaction tx = em.getTransaction();
 
     //Construção da Lista de Itens a partir da URL JSON fornecida.
     public List<Item> constroiListaDeItens(){
@@ -51,8 +54,6 @@ public class ItemController {
     
     //Gravação da Lista no BD.
     public void gravaListaNoBanco(List<Item> lista) {
-        EntityManager em = JPAController.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
         for (Item it : lista) {
             Query qry = em.createQuery("SELECT i FROM Item i WHERE i.nome = :nome");
             qry.setParameter("nome", it.getNome());
@@ -60,38 +61,32 @@ public class ItemController {
             if (resQuery.isEmpty()) {
                 tx.begin();
                 em.persist(it);
-                tx.commit();    
-                em.close();
+                tx.commit();
             }
         }
     }
     
     //Geração da Lista que é fornecida ao Modelo de Tabela para exibição.
     private List<Item> recuperaListaDoBanco() {
-        EntityManager em = JPAController.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
         Query qry = em.createQuery("SELECT i FROM Item i");
+        tx.begin();
         List<Item> lista = qry.getResultList();
+        tx.commit();
         return lista;
     }
     
     //Recupera um item da lista a partir do nome
     public Item buscaItemPorNome(String nome){
-        EntityManager em = JPAController.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
         Query qry = em.createQuery("SELECT i FROM Item i WHERE i.nome = :nome");
         qry.setParameter("nome", nome);
         tx.begin();
         Item resp = (Item)qry.getSingleResult();
         tx.commit();
-        em.close();
         return resp;
     }
 
     //Inserção de data, hora e seleção no registro do Item selecionado na tabela.
     public void atualizaItemNoBanco(Item i) {
-        EntityManager em = JPAController.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
         Query qry = em.createQuery("SELECT i FROM Item i WHERE i.nome = :nome");
         qry.setParameter("nome", i.getNome());
         Item atualizar = (Item) qry.getSingleResult();
@@ -101,6 +96,5 @@ public class ItemController {
         tx.begin();
         em.merge(atualizar);
         tx.commit();
-        em.close();
     }
 }

@@ -5,7 +5,6 @@ package br.rodrigo.view;
 *       Também é responsável por chamar os métodos para a geração da lista de Itens,
 *       bem como os métodos para inserção de data, hora e seleção quando um item da
 *       lista é selecionado.
-*       O form foi montado usando o gerador de form do Netbeans.
  */
 import br.rodrigo.controller.ItemController;
 import br.rodrigo.model.Item;
@@ -22,10 +21,10 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 public class Principal extends javax.swing.JFrame {
-
-    private final List<Item> lista = new ItemController().constroiListaDeItens();
-    private final ItemTableModel tbm = new ItemTableModel(lista);
-    private final ItemController itC = new ItemController();
+    
+    private final ItemController itc = new ItemController();
+    private final List<Item> lista = itc.constroiListaDeItens();
+    private final ItemTableModel tbm = new ItemTableModel(lista);;
     private final SimpleDateFormat sdfData = new SimpleDateFormat("dd/MM/yyyy");
     private final SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm:ss");
 
@@ -216,23 +215,20 @@ public class Principal extends javax.swing.JFrame {
         String nome = tbm.getValueAt(linha, 0).toString();
         Boolean selec = tbm.getItem(linha).getSelec();
         Date data = Calendar.getInstance().getTime();
-        if (selec == true) {
-            Item i = itC.buscaItemPorNome(nome);
+        Item i = itc.buscaItemPorNome(nome);
+        if (selec) {
             i.setDataSel(sdfData.format(data));
             i.setHoraSel(sdfHora.format(data));
             i.setSelec(true);
-            itC.atualizaItemNoBanco(i);
-            preencherDescricaoDoItem(i);
+            itc.atualizaItemNoBanco(i);
 
         } else {
-            Item i = itC.buscaItemPorNome(nome);
             i.setDataSel("");
             i.setHoraSel("");
             i.setSelec(false);
-            itC.atualizaItemNoBanco(i);
-            preencherDescricaoDoItem(i);
-
+            itc.atualizaItemNoBanco(i);
         }
+        preencherDescricaoDoItem(i);
     }//GEN-LAST:event_listaDeItensMouseClicked
 
     public static void main(String args[]) {
